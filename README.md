@@ -22,10 +22,10 @@ pip install -r requirements.txt
 ```bash
 # Tạo thư mục chứa file .exe cần quét
 mkdir samples
-cp your_file.exe samples/
+cp your_file.exe temp_scan/
 
 # Chạy phân tích
-python3 ensemble_predict_dir.py temp_scan
+python3 ensemble_predict_dir.py temp_scan/
 ```
 
 **Kết quả:** File `samples_voting_result.csv` chứa kết quả phân loại.
@@ -34,5 +34,13 @@ python3 ensemble_predict_dir.py temp_scan
 sample_name,ensemble_class,ensemble_score
 your_file.exe,malware,0.85
 ```
+
+## 🗺️ Trích xuất call graph (tùy chọn)
+
+```bash
+python3 extract_callgraph.py your_file.exe -o callgraph --render
+```
+
+Kết quả: tạo `callgraph.callgraph.dot` (và `callgraph.callgraph.png` nếu có Graphviz).
 
 ---
