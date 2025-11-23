@@ -25,7 +25,7 @@ mkdir samples
 cp your_file.exe samples/
 
 # Chạy phân tích
-python3 ensemble_predict_dir.py samples
+python3 ensemble_predict_dir.py temp_scan
 ```
 
 **Kết quả:** File `samples_voting_result.csv` chứa kết quả phân loại.
@@ -34,11 +34,5 @@ python3 ensemble_predict_dir.py samples
 sample_name,ensemble_class,ensemble_score
 your_file.exe,malware,0.85
 ```
-
-## ⚠️ Lưu ý
-
-- Chỉ hỗ trợ file PE (Windows `.exe`, `.dll`)
-- Không chạy file malware trực tiếp!
-- Kết quả là dự đoán, nên kết hợp thêm antivirus khác
 
 ---
