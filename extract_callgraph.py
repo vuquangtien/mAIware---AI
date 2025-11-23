@@ -86,16 +86,42 @@ def bfs_limit(graph: nx.DiGraph, start: int, limit: int) -> set[int]:
 
 def write_dot(graph: nx.DiGraph, cfg, path: str) -> None:
     with open(path, "w") as f:
+        # Modern graph styling with solid backgrounds, rounded corners, custom fonts
         f.write("digraph callgraph {\n")
+        f.write("  // Graph-level styling\n")
+        f.write('  graph [bgcolor="#0a0e27", pad="0.5", nodesep="1.0", ranksep="1.2", splines=ortho];\n')
+        f.write('  node [shape=box, style="filled,rounded", fontname="Fira Code,Consolas,monospace", fontsize=11, fontcolor="#e0e0e0", penwidth=2];\n')
+        f.write('  edge [color="#4a9eff88", penwidth=2.0, arrowsize=0.8];\n')
+        f.write("\n")
+        
+        # Node styling with gradient-like colors
         for node in graph.nodes():
             func = cfg.kb.functions.get(node)
             if func is None:
                 label = hex(node)
+                node_style = 'fillcolor="#1a1f3a", color="#3d5a80"'
             else:
                 name = func.name or "sub_" + hex(func.addr)[2:]
-                label = f"{name}\n{hex(func.addr)}"
+                label = f"{name}\\n{hex(func.addr)}"
+                
+                # Color-code based on function type/name patterns
+                if "main" in name.lower() or "entry" in name.lower():
+                    # Entry point - vibrant cyan
+                    node_style = 'fillcolor="#0d7377:#14919b", gradientangle=90, color="#2ec4b6", fontcolor="#ffffff", fontsize=12'
+                elif any(suspicious in name.lower() for suspicious in ["inject", "allocate", "remote", "virtual", "create", "write"]):
+                    # Suspicious APIs - red gradient
+                    node_style = 'fillcolor="#c1121f:#780000", gradientangle=90, color="#ff006e", fontcolor="#ffffff", fontsize=11'
+                elif name.startswith("sub_"):
+                    # Unknown functions - dark blue
+                    node_style = 'fillcolor="#1e2749", color="#4361ee"'
+                else:
+                    # Standard functions - teal gradient
+                    node_style = 'fillcolor="#1a535c:#264653", gradientangle=90, color="#4ecdc4"'
+            
             label = label.replace('"', "'")
-            f.write(f'  "{hex(node)}" [label="{label}"];\n')
+            f.write(f'  "{hex(node)}" [label="{label}", {node_style}];\n')
+        
+        f.write("\n  // Edges\n")
         for src, dst in graph.edges():
             f.write(f'  "{hex(src)}" -> "{hex(dst)}";\n')
         f.write("}\n")
