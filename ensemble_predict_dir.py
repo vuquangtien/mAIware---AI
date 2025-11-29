@@ -85,9 +85,16 @@ def run_models(feature_matrix: np.ndarray, model_names: Sequence[str], models_di
 
 
 def build_output_df(meta_df: pd.DataFrame, voting_df: pd.DataFrame) -> pd.DataFrame:
-    merged = voting_df.merge(meta_df[['sample_index', 'sample_name', 'sample_path']], on='sample_index', how='left')
+    # Include Entropy_Total if available
+    merge_cols = ['sample_index', 'sample_name', 'sample_path']
+    if 'Entropy_Total' in meta_df.columns:
+        merge_cols.append('Entropy_Total')
+    merged = voting_df.merge(meta_df[merge_cols], on='sample_index', how='left')
     # reorder columns for readability
-    columns = ['sample_index', 'sample_name', 'sample_path', 'votes_benign', 'votes_malware', 'ensemble_label']
+    columns = ['sample_index', 'sample_name', 'sample_path']
+    if 'Entropy_Total' in merged.columns:
+        columns.append('Entropy_Total')
+    columns.extend(['votes_benign', 'votes_malware', 'ensemble_label'])
     if 'ensemble_score' in merged.columns:
         columns.append('ensemble_score')
     columns.extend([c for c in merged.columns if c not in columns and not c.endswith('_pred') and not c.endswith('_score')])
